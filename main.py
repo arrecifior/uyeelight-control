@@ -1,10 +1,21 @@
 from uyeelight import *
+import network
 
-# see yeelight app for IP
-bulb = Bulb("192.168.0.180")
+bulb = Bulb("192.168.1.51")
 
-try:
-    if not bulb.is_on:
-        bulb.turn_on()
-except YeeLightException as e:
-    print(e)
+sta_if = network.WLAN(network.STA_IF)
+sta_if.active(True)
+
+while True:
+
+    # wait until WiFi is connected, you need to configure it beforehand
+    if sta_if.isconnected():
+
+        try:
+            bulb.turn_on()
+        except YeeLightException as e:
+            print(e)
+        except:
+            print("An error ¯\_(ツ)_/¯")
+
+        break
