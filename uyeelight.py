@@ -1,7 +1,6 @@
 import usocket as socket
 import json
 
-
 class YeeLightException(Exception):
     pass
 
@@ -63,30 +62,34 @@ class Bulb():
     def get_port(self):
         return self._port
 
-    def turn_on(self, effect=EFFECT.SUDDEN, duration=30, mode=MODE.NORMAL):
+    def turn_on(self, effect=EFFECT.SMOOTH, duration=300, mode=MODE.NORMAL):
         return self._handle_response(self._send_message("set_power",
                                                         ["on", effect, duration, mode]))
 
-    def turn_off(self, effect=EFFECT.SUDDEN, duration=30, mode=MODE.NORMAL):
+    def turn_off(self, effect=EFFECT.SMOOTH, duration=300, mode=MODE.NORMAL):
         return self._handle_response(self._send_message("set_power",
                                                         ["off", effect, duration, mode]))
 
     def toggle(self):
         return self._handle_response(self._send_message("toggle"))
 
+    #TODO: FIX _handle_response to fix this property
     @property
     def is_on(self):
         result = self._handle_response(self._send_message("get_prop", ["power"]))
+        
+        print(result)
+
         return result[0] == "on"
 
-    def change_color_temperature(self, color_temp_val, effect=EFFECT.SUDDEN, duration=30):
+    def change_color_temperature(self, color_temp_val, effect=EFFECT.SMOOTH, duration=300):
         """
         :param color_temp_val: between 1700 and 6500K
         """
         return self._handle_response(self._send_message("set_ct_abx",
                                                         [color_temp_val, effect, duration]))
 
-    def set_rgb(self, r, g, b, effect=EFFECT.SUDDEN, duration=30):
+    def set_rgb(self, r, g, b, effect=EFFECT.SMOOTH, duration=300):
         """
         :param r: red
         :param g: green
@@ -96,7 +99,7 @@ class Bulb():
         return self._handle_response(self._send_message("set_rgb",
                                                         [rgb, effect, duration]))
 
-    def set_hsv(self, hue, sat, effect=EFFECT.SUDDEN, duration=30):
+    def set_hsv(self, hue, sat, effect=EFFECT.SMOOTH, duration=300):
         """
         :param hue: ranges from 0 to 359
         :param sat:  ranges from 0 to 100
@@ -104,7 +107,7 @@ class Bulb():
         return self._handle_response(self._send_message("set_hsv",
                                                         [hue, sat, effect, duration]))
 
-    def set_brightness(self, brightness, effect=EFFECT.SUDDEN, duration=30):
+    def set_brightness(self, brightness, effect=EFFECT.SMOOTH, duration=300):
         """
         :param brightness: between 1 and 100
         """
@@ -172,21 +175,21 @@ class Bulb():
         return self._handle_response(self._send_message("set_adjust",
                                                         [action, prop]))
 
-    def adjust_brightness(self, percentage, duration=30):
+    def adjust_brightness(self, percentage, duration=300):
         """
         :param percentage: the percentage to be adjusted. The range is: -100 ~ 100
         """
         return self._handle_response(self._send_message("adjust_bright",
                                                         [percentage, duration]))
 
-    def adjust_color_temperature(self, percentage, duration=30):
+    def adjust_color_temperature(self, percentage, duration=300):
         """
         :param percentage: the percentage to be adjusted. The range is: -100 ~ 100
         """
         return self._handle_response(self._send_message("adjust_ct",
                                                         [percentage, duration]))
 
-    def adjust_color(self, percentage, duration=30):
+    def adjust_color(self, percentage, duration=300):
         """
          :param percentage: the percentage to be adjusted. The range is: -100 ~ 100
          """
@@ -219,20 +222,27 @@ class Bulb():
         message = '{{"id": {id}, "method": "{method}", "params": {params}}}\r\n'. \
             format(id=self.cmd_id, method=method, params=json.dumps(params))
 
+        print('message:', message)
+
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
             sock.connect((self.get_ip, self.get_port))
             sock.send(message.encode())
             recv_data = sock.recv(1024)
-        except socket.timeout:
-            return ""
+        except OSError:
+            return "OSError"
         finally:
             sock.close()
 
         return recv_data
 
     def _handle_response(self, response):
+
+        print(response) #tmp
+
+        '''
+        TODO: FIX JSON decode
         response = json.loads(response.decode('utf-8'))
 
         if self.debug:
@@ -246,3 +256,4 @@ class Bulb():
             raise YeeLightException(response["error"])
         else:
             raise YeeLightException("Unknown Exception occurred.")
+        '''
