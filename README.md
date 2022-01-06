@@ -22,3 +22,6 @@ https://osdn.net/projects/ttssh2/downloads/67384/teraterm-4.60.exe/
 
 WebREPL client for MicroPython:
 https://github.com/micropython/webrepl
+
+Wemos D1 Mini Pinout:
+https://randomnerdtutorials.com/esp8266-pinout-reference-gpios/

@@ -222,8 +222,6 @@ class Bulb():
         message = '{{"id": {id}, "method": "{method}", "params": {params}}}\r\n'. \
             format(id=self.cmd_id, method=method, params=json.dumps(params))
 
-        print('message:', message)
-
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
