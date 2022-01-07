@@ -1,5 +1,7 @@
 import usocket as socket
 import json
+import time
+
 
 class YeeLightException(Exception):
     pass
@@ -44,7 +46,7 @@ class SET_ADJUST_PROP:
     COLOR = "color"
 
 
-""" API DOCS: https://www.yeelight.com/download/Yeelight_Inter-Operation_Spec.pdf """
+""" API DOCS: https://home.yeelight.de/site/templates/downloads/yeelight_inter-operation-spec.pdf """
 
 
 class Bulb():
@@ -82,7 +84,7 @@ class Bulb():
 
         return result[0] == "on"
 
-    def change_color_temperature(self, color_temp_val, effect=EFFECT.SMOOTH, duration=300):
+    def set_ct(self, color_temp_val, effect=EFFECT.SMOOTH, duration=300):
         """
         :param color_temp_val: between 1700 and 6500K
         """
@@ -133,10 +135,10 @@ class Bulb():
     def stop_color_flow(self):
         return self._handle_response(self._send_message("stop_cf"))
 
-    def set_scene(self, val1, val2, val3, opt=SCENE_CLASS.COLOR):
+    def set_scene(self, mode, par1, par2):
         """
-        :param val1: :param val2: :param val3: are class specific. (see API docs)
-        :param opt: can be "color", "hsv", "ct", "cf", "auto_delay_off".
+        :param par1: :param par2: are class specific. (see API docs)
+        :param mode: can be "color", "hsv", "ct", "cf", "auto_delay_off".
                       "color" means change the smart LED to specified color and brightness.
                       "hsv" means change the smart LED to specified color and brightness.
                       "ct" means change the smart LED to specified ct and brightness.
@@ -145,7 +147,7 @@ class Bulb():
                       brightness and start a sleep timer to turn off the light after the specified minutes.
         """
         return self._handle_response(self._send_message("set_scene",
-                                                        [opt, val1, val2, val3]))
+                                                        [mode, par1, par2]))
 
     def sleep_timer(self, time_minutes, type=0):
         return self._handle_response(self._send_message("cron_add",
@@ -255,3 +257,47 @@ class Bulb():
         else:
             raise YeeLightException("Unknown Exception occurred.")
         '''
+
+
+class Preset():
+    OFF = { 'brightness': 0 }
+    BRIGHT = { 'brightness': 100, 'mode': SCENE_CLASS.CT, 'value': 3200 }
+    WARM = { 'brightness': 100, 'mode': SCENE_CLASS.CT, 'value': 2700 }
+    DIM = { 'brightness': 1, 'mode': SCENE_CLASS.CT, 'value': 1700 }
+    RED = { 'brightness': 100, 'mode': SCENE_CLASS.COLOR, 'value': (255 * 65536) + (0 * 256) + 0 }
+    GREEN = { 'brightness': 100, 'mode': SCENE_CLASS.COLOR, 'value': (0 * 65536) + (255 * 256) + 0 }
+    BLUE = { 'brightness': 100, 'mode': SCENE_CLASS.COLOR, 'value': (0 * 65536) + (0 * 256) + 255 }
+
+    def set(bulb_ip, preset):
+
+        bulb = Bulb(bulb_ip)
+
+        if preset.get('brightness') == 0:
+
+            try:
+                bulb.turn_off()
+            except:
+                print(bulb_ip, "Error while turning off the bulb!")
+
+        else:
+            
+            try:
+                bulb.set_scene(preset.get('mode'), preset.get('value'), preset.get('brightness'))
+            except:
+                print(bulb_ip, "Error while changing bulb state!")
+
+
+class Scene():
+    OFF = [Preset.OFF, Preset.OFF, Preset.OFF, Preset.OFF]
+    BRIGHT = [Preset.BRIGHT, Preset.OFF, Preset.OFF, Preset.OFF]
+    WARM = [Preset.WARM, Preset.OFF, Preset.OFF, Preset.OFF]
+    DIM = [Preset.DIM, Preset.OFF, Preset.OFF, Preset.OFF]
+    EVENING = [Preset.WARM, Preset.WARM, Preset.WARM, Preset.WARM]
+    CREATIVE = [Preset.RED, Preset.BLUE, Preset.BLUE, Preset.BLUE]
+
+    def set(bulbs_ip, scene):
+
+        for p in range(4):
+            Preset.set(bulbs_ip[p], scene[p])
+
+        time.sleep(0.3)
