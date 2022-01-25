@@ -1,7 +1,6 @@
 from uyeelight import *
 from machine import Pin
 import network
-import time
 
 # Available pins
 class GPIO:
@@ -21,11 +20,14 @@ btn1 = Pin(GPIO.D5, Pin.IN)
 btn2 = Pin(GPIO.D6, Pin.IN)
 btn3 = Pin(GPIO.D7, Pin.IN)
 
+btbig = Pin(GPIO.D1, Pin.IN)
+
 sta_if = network.WLAN(network.STA_IF)
 sta_if.active(True)
 
 # Interface handler.
 def main():
+
     last1 = 0
     last2 = 0
     last3 = 0
@@ -33,17 +35,17 @@ def main():
     while(True):
 
         val = btn1.value()
-        if last1 == 0 and val == 1:
+        if last1 == 1 and val == 0:
             Scene.set(bulbs, Scene.OFF)
         last1 = val
 
         val = btn2.value()
-        if last2 == 0 and val == 1:
+        if last2 == 1 and val == 0:
             Scene.set(bulbs, Scene.WARM)
         last2 = val
 
         val = btn3.value()
-        if last3 == 0 and val == 1:
+        if last3 == 1 and val == 0:
             Scene.set(bulbs, Scene.CREATIVE)
         last3 = val
 
