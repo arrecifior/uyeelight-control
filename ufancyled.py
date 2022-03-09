@@ -24,8 +24,8 @@ class FancyLED():
                     self.led_pwm.duty(1024 - duty_cycle)
                     sleep(length)
 
-    def flash(self, times):
-        for i in range(times):
-            self.fade(True, 0.5)
-            self.fade(False, 1)
-            sleep(0.3)
+    def flash(self, reps, hold_time=0.3, in_time=0.5, out_time=1):
+        for i in range(reps):
+            self.fade(True, in_time)
+            self.fade(False, out_time)
+            sleep(hold_time)

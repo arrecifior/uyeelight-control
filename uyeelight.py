@@ -299,5 +299,3 @@ class Scene():
 
         for p in range(4):
             Preset.set(bulbs_ip[p], scene[p])
-
-        time.sleep(0.3)
