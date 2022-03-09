@@ -1,6 +1,5 @@
 import usocket as socket
 import json
-import time
 
 
 class YeeLightException(Exception):
@@ -215,6 +214,22 @@ class Bulb():
         return self._handle_response(self._send_message("set_name",
                                                         [name]))
 
+    def set(self, preset):
+
+        if preset.get('brightness') == 0:
+
+            try:
+                self.turn_off()
+            except:
+                print(self._ip, "Error while turning off the bulb!")
+
+        else:
+            
+            try:
+                self.set_scene(preset.get('mode'), preset.get('value'), preset.get('brightness'))
+            except:
+                print(self._ip, "Error while changing bulb state!")
+
     def _send_message(self, method, params=None):
         if params is None:
             params = []
@@ -259,7 +274,7 @@ class Bulb():
         '''
 
 
-class Preset():
+class PRESET():
     OFF = { 'brightness': 0 }
     BRIGHT = { 'brightness': 100, 'mode': SCENE_CLASS.CT, 'value': 3200 }
     WARM = { 'brightness': 100, 'mode': SCENE_CLASS.CT, 'value': 2700 }
@@ -268,34 +283,22 @@ class Preset():
     GREEN = { 'brightness': 100, 'mode': SCENE_CLASS.COLOR, 'value': (0 * 65536) + (255 * 256) + 0 }
     BLUE = { 'brightness': 100, 'mode': SCENE_CLASS.COLOR, 'value': (0 * 65536) + (0 * 256) + 255 }
 
-    def set(bulb_ip, preset):
-
-        bulb = Bulb(bulb_ip)
-
-        if preset.get('brightness') == 0:
-
-            try:
-                bulb.turn_off()
-            except:
-                print(bulb_ip, "Error while turning off the bulb!")
-
-        else:
-            
-            try:
-                bulb.set_scene(preset.get('mode'), preset.get('value'), preset.get('brightness'))
-            except:
-                print(bulb_ip, "Error while changing bulb state!")
-
 
 class Scene():
-    OFF = [Preset.OFF, Preset.OFF, Preset.OFF, Preset.OFF]
-    BRIGHT = [Preset.BRIGHT, Preset.OFF, Preset.OFF, Preset.OFF]
-    WARM = [Preset.WARM, Preset.OFF, Preset.OFF, Preset.OFF]
-    DIM = [Preset.DIM, Preset.OFF, Preset.OFF, Preset.OFF]
-    EVENING = [Preset.WARM, Preset.WARM, Preset.WARM, Preset.WARM]
-    CREATIVE = [Preset.RED, Preset.BLUE, Preset.BLUE, Preset.BLUE]
+    OFF = [PRESET.OFF, PRESET.OFF, PRESET.OFF, PRESET.OFF]
+    BRIGHT = [PRESET.BRIGHT, PRESET.OFF, PRESET.OFF, PRESET.OFF]
+    WARM = [PRESET.WARM, PRESET.OFF, PRESET.OFF, PRESET.OFF]
+    DIM = [PRESET.DIM, PRESET.OFF, PRESET.OFF, PRESET.OFF]
+    EVENING = [PRESET.WARM, PRESET.WARM, PRESET.WARM, PRESET.WARM]
+    CREATIVE = [PRESET.RED, PRESET.BLUE, PRESET.BLUE, PRESET.BLUE]
 
-    def set(bulbs_ip, scene):
+    def __init__(self, bulbs):
+        self.bulbs = []
 
-        for p in range(4):
-            Preset.set(bulbs_ip[p], scene[p])
+        for bulb_ip in bulbs:
+            self.bulbs.append(Bulb(bulb_ip))
+
+    def set(self, scene):
+
+        for b in range(self.bulbs.len()):
+            self.bulbs[b].set_preset(scene[b])

@@ -28,35 +28,40 @@ in4 = Pin(GPIO.D7, Pin.IN, Pin.PULL_UP)
 # Indicate startup
 led.fade(True, 2)
 
+
 # Init button handler
 buttons = ButtonHandler(in1, in2, in3, in4)
+
+# Init Scenes
+scene = Scene(bulbs)
 
 # Init WiFi
 sta_if = network.WLAN(network.STA_IF)
 sta_if.active(True)
 
-# Interface handler.
+
+# Interface handler
 def main():
     while True:
         button = buttons.get_status()
 
         if button == 0:
-            Scene.set(bulbs, Scene.OFF)
+            scene.set(scene.OFF)
             led.flash(1)
         elif button == 1:
-            Scene.set(bulbs, Scene.EVENING)
+            scene.set(scene.EVENING)
             led.flash(1)
         elif button == 2:
-            Scene.set(bulbs, Scene.BRIGHT)
+            scene.set(scene.BRIGHT)
             led.flash(1)
         elif button == 3:
-            Scene.set(bulbs, Scene.WARM)
+            scene.set(scene.WARM)
             led.flash(1)
         elif button == 4:
-            Scene.set(bulbs, Scene.DIM)
+            scene.set(scene.DIM)
             led.flash(1)
         elif button == 5:
-            Scene.set(bulbs, Scene.CREATIVE)
+            scene.set(scene.CREATIVE)
             led.flash(1)
         elif button == 6:
             pass
@@ -64,6 +69,7 @@ def main():
             pass
         elif button == 8:
             pass
+
 
 while True:
     # Wait until WiFi is connected, you need to configure it beforehand.
