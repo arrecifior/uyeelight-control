@@ -42,16 +42,22 @@ def main():
 
         if button == 0:
             Scene.set(bulbs, Scene.OFF)
+            led.flash(1)
         elif button == 1:
             Scene.set(bulbs, Scene.EVENING)
+            led.flash(1)
         elif button == 2:
             Scene.set(bulbs, Scene.BRIGHT)
+            led.flash(1)
         elif button == 3:
             Scene.set(bulbs, Scene.WARM)
+            led.flash(1)
         elif button == 4:
             Scene.set(bulbs, Scene.DIM)
+            led.flash(1)
         elif button == 5:
             Scene.set(bulbs, Scene.CREATIVE)
+            led.flash(1)
         elif button == 6:
             pass
         elif button == 7:

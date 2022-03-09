@@ -28,4 +28,5 @@ class FancyLED():
         for i in range(reps):
             self.fade(True, in_time)
             self.fade(False, out_time)
-            sleep(hold_time)
+            if reps > 1:
+                sleep(hold_time)
