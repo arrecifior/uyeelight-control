@@ -1,4 +1,3 @@
-from nis import match
 from uyeelight import Scene
 from ufancyled import FancyLED
 from ubuttonhandler import ButtonHandler
